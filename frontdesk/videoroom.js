@@ -73,6 +73,7 @@ $(document).ready(function() {
     $('#room-publishers').val(roompublishers);
     $('#room-secret').val(roomsecret);
     $('#room-pin').val(roompin);
+    $('#room-bandwidth').val(bandwidth);
     Janus.init({
         debug: "all",
         callback: function() {
@@ -82,6 +83,7 @@ $(document).ready(function() {
                 roomsecret = $('#room-secret').val();
                 roompin = $('#room-pin').val();
                 roompublishers = +$('#room-publishers').val();
+                bandwidth = +$('#room-bandwidth').val();
                 $(this).attr('disabled', true).unbind('click');
                 // Make sure the browser supports WebRTC
                 if (!Janus.isWebrtcSupported()) {
