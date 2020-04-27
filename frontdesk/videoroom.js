@@ -70,6 +70,9 @@ var bandwidth = 128000;
 $(document).ready(function() {
     // Initialize the library (all console debuggers enabled)
     $('#room-description').val(roomdesc);
+    $('#room-publishers').val(roompublishers);
+    $('#room-secret').val(roomsecret);
+    $('#room-pin').val(roompin);
     Janus.init({
         debug: "all",
         callback: function() {
