@@ -49,9 +49,9 @@
                 <div class="container" id="details">
                     <div class="row">
                         <div class="col-md-12">
-                            <p>This app create dedicated Video Room On fly with specifyed pin code for security reason
-                                <p>Press the <code>Start</code> button above to Start dedicated video room.</p>
-                                <br/> default admin password code <code>adminpwd</code><br/> default pin code <code>1010</code><br/>
+                            <p>This front desk app can create dedicated Video Room on fly with specific details below<br/>
+                                <br/> default admin password code <code>adminpwd</code><br/> default pin code <code>1010</code><br/> default bandwidth 0 means<code>no limit</code><br/>
+                            </p>
                         </div>
                     </div>
                     <div class="row">
@@ -89,7 +89,16 @@
                                 <input autocomplete="off" class="form-control" autocomplete="off" type="password" placeholder="Choose a room admin password" id="room-secret"></input>
                             </div>
                         </div>
-                        <div class="col-md-12" id="controls">
+                        <div class="col-md-12">
+                            <div class="input-group margin-bottom-md">
+                                <span class="input-group-addon">Current Room List</span>
+                                <select autocomplete="off" class="form-control" autocomplete="off" id="room-list"></select>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary" autocomplete="off" id="bt-refresh">Refresh</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
                             <div class="input-group margin-bottom-md">
                                 <span class="input-group-addon">Room Id</span>
                                 <input autocomplete="off" class="form-control" autocomplete="off" type="number" placeholder="room id 12345678" id="room-id"></input>

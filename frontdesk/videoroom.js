@@ -77,10 +77,14 @@ $(document).ready(function() {
     $('#room-id').on('keyup paste', function() {
         $('#bt-delete').attr('disabled', !(+$(this).val() > 0));
     });
+    $('#room-list').on('change', function() {
+        $('#room-id').val($(this).val());
+        $('#bt-delete').removeAttr('disabled');
+    });
     Janus.init({
         debug: "all",
         callback: function() {
-            // Use a button to start the demo
+            // Use a button to start the room
             $('#bt-create').one('click', function() {
                 roomdesc = $('#room-description').val();
                 roomsecret = $('#room-secret').val();
@@ -386,6 +390,60 @@ $(document).ready(function() {
                     }
                 });
             });
+            $('#bt-refresh').on('click', function() {
+                // Make sure the browser supports WebRTC
+                if (!Janus.isWebrtcSupported()) {
+                    bootbox.alert("No WebRTC support... ");
+                    return;
+                }
+                // Create session
+                janus = new Janus({
+                    server: server,
+                    success: function() {
+                        // Attach to VideoRoom plugin
+                        janus.attach({
+                            plugin: "janus.plugin.videoroom",
+                            opaqueId: opaqueId,
+                            success: function(pluginHandle) {
+                                sfutest = pluginHandle;
+                                sfutest.send({
+                                    "message": {
+                                        "request": "list"
+                                    },
+                                    success: function(response) {
+                                        if ('success' === response.videoroom) {
+                                            let rooms = response.list.sort((a, b) => {
+                                                const aDesc = a.description.toLowerCase();
+                                                const bDesc = b.description.toLowerCase();
+                                                return ((aDesc < bDesc) ? -1 : ((aDesc > bDesc) ? 1 : 0));
+                                            });
+                                            $.each(rooms, function(index, value) {
+                                                $('<option>').val(value.room).text(value.description).appendTo('#room-list');
+                                            });
+                                        } else {
+                                            bootbox.alert("Get room list failed error " + response.error_code + '<br/>\n ' + response.error);
+                                        }
+                                        janus.destroy();
+                                    },
+                                    error: function(error) {
+                                        bootbox.alert("Get room list failed " + error);
+                                    }
+                                });
+                            },
+                            error: function(error) {
+                                Janus.error("  -- Error attaching plugin...", error);
+                                bootbox.alert("Error attaching plugin... " + error);
+                            }
+                        });
+                    },
+                    error: function(error) {
+                        Janus.error(error);
+                        bootbox.alert(error, function() {
+                            window.location.reload();
+                        });
+                    }
+                });
+            });
 
             $('#bt-delete').one('click', function() {
                 roomsecret = $('#room-secret').val();
@@ -418,19 +476,16 @@ $(document).ready(function() {
                                         } else {
                                             bootbox.alert("destroy room failed error " + response.error_code + '<br/>\n ' + response.error);
                                         }
+                                        janus.destroy();
                                     },
                                     error: function(error) {
                                         bootbox.alert("Destroy room failed " + error);
                                     }
                                 });
-                                janus.destroy();
                             },
                             error: function(error) {
                                 Janus.error("  -- Error attaching plugin...", error);
                                 bootbox.alert("Error attaching plugin... " + error);
-                            },
-                            mediaState: function(medium, on) {
-                                Janus.log("Janus " + (on ? "started" : "stopped") + " receiving our " + medium);
                             },
                             oncleanup: function() {
                                 Janus.log(" ::: Got a cleanup notification: we are unpublished now :::");
@@ -450,7 +505,7 @@ $(document).ready(function() {
             });
         }
     });
-
+    $('#bt-refresh').click();
 });
 
 function checkEnter(field, event) {
