@@ -42,39 +42,48 @@
             <div class="col-md-12">
                 <div class="page-header">
                     <h1>Video Room Control
-                        <button class="btn btn-success" autocomplete="off" id="start">Start</button>
-                        <br/>
-                        <span id="room-label"></span> <span id="room-id"></span>
+                        <button class="btn btn-success" autocomplete="off" id="bt-create">Create room</button>
                     </h1>
+                    <h2 id="room-label"></h2>
                 </div>
                 <div class="container" id="details">
                     <div class="row">
                         <div class="col-md-12">
-                            <h3>Usages details</h3>
                             <p>This app create dedicated Video Room On fly with specifyed pin code for security reason
                                 <p>Press the <code>Start</code> button above to Start dedicated video room.</p>
                                 <br/> default admin password code <code>adminpwd</code><br/> default pin code <code>1010</code><br/>
-                                <br/>
-                                <a class="btn btn-default" href="https://arfeifei.github.io" target="_blank">Click to Join Jangouts Video Conference Room from here</a>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <h3>Room detail information</h3>
+                            <h3>Room Information</h3>
                         </div>
-                        <div class="col-md-12" id="controls">
+                        <div class="col-md-12">
                             <div class="input-group margin-bottom-md">
                                 <span class="input-group-addon">Room Description</span>
                                 <input autocomplete="off" class="form-control" autocomplete="off" type="text" placeholder="Room Description" id="room-description"></input>
                             </div>
                         </div>
-                        <div class="col-md-12" id="controls">
+                        <div class="col-md-12">
                             <div class="input-group margin-bottom-md">
                                 <span class="input-group-addon">Number of People</span>
                                 <input autocomplete="off" class="form-control" autocomplete="off" type="number" placeholder="Choose how many people in room" id="room-publishers"></input>
                             </div>
                         </div>
-                        <div class="col-md-12" id="controls">
+                        <div class="col-md-12">
+                            <div class="input-group margin-bottom-md">
+                                <span class="input-group-addon">PIN Code</span>
+                                <input autocomplete="off" class="form-control" autocomplete="off" type="password" placeholder="Choose a room pin code" id="room-pin"></input>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="input-group margin-bottom-md">
+                                <span class="input-group-addon">Bandwidth</span>
+                                <input autocomplete="off" class="form-control" autocomplete="off" type="number" placeholder="bandwidth" id="room-bandwidth"></input>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div class="col-md-12">
                             <div class="input-group margin-bottom-md">
                                 <span class="input-group-addon">Admin Password</span>
                                 <input autocomplete="off" class="form-control" autocomplete="off" type="password" placeholder="Choose a room admin password" id="room-secret"></input>
@@ -82,14 +91,11 @@
                         </div>
                         <div class="col-md-12" id="controls">
                             <div class="input-group margin-bottom-md">
-                                <span class="input-group-addon">PIN Code</span>
-                                <input autocomplete="off" class="form-control" autocomplete="off" type="password" placeholder="Choose a room pin code" id="room-pin"></input>
-                            </div>
-                        </div>
-                        <div class="col-md-12" id="controls">
-                            <div class="input-group margin-bottom-md">
-                                <span class="input-group-addon">Bandwidth</span>
-                                <input autocomplete="off" class="form-control" autocomplete="off" type="number" placeholder="bandwidth" id="room-bandwidth"></input>
+                                <span class="input-group-addon">Room Id</span>
+                                <input autocomplete="off" class="form-control" autocomplete="off" type="number" placeholder="room id 12345678" id="room-id"></input>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-danger" autocomplete="off" id="bt-delete" disabled>Delete room</button>
+                                </span>
                             </div>
                         </div>
                     </div>

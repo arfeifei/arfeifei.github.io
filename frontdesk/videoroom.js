@@ -65,7 +65,7 @@ var bitrateTimer = [];
 var doSimulcast = (getQueryStringValue("simulcast") === "yes" || getQueryStringValue("simulcast") === "true");
 var doSimulcast2 = (getQueryStringValue("simulcast2") === "yes" || getQueryStringValue("simulcast2") === "true");
 
-var bandwidth = 128000;
+var bandwidth = 0;
 
 $(document).ready(function() {
     // Initialize the library (all console debuggers enabled)
@@ -74,11 +74,14 @@ $(document).ready(function() {
     $('#room-secret').val(roomsecret);
     $('#room-pin').val(roompin);
     $('#room-bandwidth').val(bandwidth);
+    $('#room-id').on('keyup paste', function() {
+        $('#bt-delete').attr('disabled', !(+$(this).val() > 0));
+    });
     Janus.init({
         debug: "all",
         callback: function() {
             // Use a button to start the demo
-            $('#start').one('click', function() {
+            $('#bt-create').one('click', function() {
                 roomdesc = $('#room-description').val();
                 roomsecret = $('#room-secret').val();
                 roompin = $('#room-pin').val();
@@ -108,26 +111,9 @@ $(document).ready(function() {
                                 $('#registernow').removeClass('hide').show();
                                 $('#register').click(registerUsername);
                                 $('#username').focus();
-                                $('#start').removeAttr('disabled').html("Stop")
+                                $('#bt-create').removeAttr('disabled').html("Leave room")
                                     .click(function() {
                                         $(this).attr('disabled', true);
-                                        sfutest.send({
-                                            "message": {
-                                                "request": "destroy",
-                                                "secret": roomsecret,
-                                                "room": myroom
-                                            },
-                                            success: function(response) {
-                                                if ('destroyed' === response.videoroom) {
-                                                    console.log("video room [" + roomdesc + "] destroyed.");
-                                                } else {
-                                                    bootbox.alert("destroy room failed error " + response.error_code + '<br/>\n ' + response.error);
-                                                }
-                                            },
-                                            error: function(error) {
-                                                bootbox.alert("Destroy room failed " + error);
-                                            }
-                                        });
                                         janus.destroy();
                                     });
                                 var createRoom = {
@@ -145,8 +131,7 @@ $(document).ready(function() {
                                     success: function(response) {
                                         if ('created' === response.videoroom) {
                                             myroom = response.room;
-                                            $('#room-label').html(createRoom.description);
-                                            $('#room-id').html(myroom);
+                                            $('#room-label').html(createRoom.description + ' [' + myroom + ']');
                                         } else {
                                             bootbox.alert("Creating room failed error " + response.error_code + '<br/>\n ' + response.error);
                                         }
@@ -401,8 +386,71 @@ $(document).ready(function() {
                     }
                 });
             });
+
+            $('#bt-delete').one('click', function() {
+                roomsecret = $('#room-secret').val();
+                myroom = +$('#room-id').val();
+                $(this).attr('disabled', true).unbind('click');
+                // Make sure the browser supports WebRTC
+                if (!Janus.isWebrtcSupported()) {
+                    bootbox.alert("No WebRTC support... ");
+                    return;
+                }
+                // Create session
+                janus = new Janus({
+                    server: server,
+                    success: function() {
+                        // Attach to VideoRoom plugin
+                        janus.attach({
+                            plugin: "janus.plugin.videoroom",
+                            opaqueId: opaqueId,
+                            success: function(pluginHandle) {
+                                sfutest = pluginHandle;
+                                sfutest.send({
+                                    "message": {
+                                        "request": "destroy",
+                                        "secret": roomsecret,
+                                        "room": myroom
+                                    },
+                                    success: function(response) {
+                                        if ('destroyed' === response.videoroom) {
+                                            Janus.log("video room id [" + myroom + "] destroyed.");
+                                        } else {
+                                            bootbox.alert("destroy room failed error " + response.error_code + '<br/>\n ' + response.error);
+                                        }
+                                    },
+                                    error: function(error) {
+                                        bootbox.alert("Destroy room failed " + error);
+                                    }
+                                });
+                                janus.destroy();
+                            },
+                            error: function(error) {
+                                Janus.error("  -- Error attaching plugin...", error);
+                                bootbox.alert("Error attaching plugin... " + error);
+                            },
+                            mediaState: function(medium, on) {
+                                Janus.log("Janus " + (on ? "started" : "stopped") + " receiving our " + medium);
+                            },
+                            oncleanup: function() {
+                                Janus.log(" ::: Got a cleanup notification: we are unpublished now :::");
+                            }
+                        });
+                    },
+                    error: function(error) {
+                        Janus.error(error);
+                        bootbox.alert(error, function() {
+                            window.location.reload();
+                        });
+                    },
+                    destroyed: function() {
+                        window.location.reload();
+                    }
+                });
+            });
         }
     });
+
 });
 
 function checkEnter(field, event) {
